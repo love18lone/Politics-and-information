@@ -1,0 +1,107 @@
+---
+title: "Politics and Information HW1:高雄市長選舉，韓國瑜與陳其邁的PO文按讚分析"
+author: "Kyle"
+date: "2019年3月10日"
+output: html_document
+---
+```{r}
+#讀入檔案(2018年11月)
+library(readr)
+data <- read_csv("201811_data.csv")
+View(X201801_data)
+```
+
+
+
+```{r}
+#這筆資料韓國瑜的粉絲專頁共PO了254篇文章，陳其邁粉絲專頁共PO了126篇文章
+K = grep("韓國瑜", data$Page_Name)
+data$Page_Name[K]
+C = grep("陳其邁",data$Page_Name)
+data$Page_Name[C]
+#韓國瑜有兩個粉專:韓國瑜、高雄選韓國瑜News
+#陳其邁只有一個粉專陳其邁 Chen Chi-Mai
+```
+
+```{r}
+#計算韓國瑜貼文粉絲按的表情(like,wow,love,haha,sad,angry)數量
+
+tapply(data$LIKE_COUNT, data$Page_Name == "韓國瑜",sum)#韓國瑜like數量為2728724 個
+tapply(data$WOW_COUNT, data$Page_Name == "韓國瑜",sum)#韓國瑜wow數量為2684個
+tapply(data$LOVE_COUNT, data$Page_Name == "韓國瑜",sum)#韓國瑜love數量158399個
+tapply(data$HAHA_COUNT, data$Page_Name == "韓國瑜",sum)#韓國瑜haha數量19825 個
+tapply(data$SAD_COUNT, data$Page_Name == "韓國瑜",sum)#韓國瑜sad數量2990個
+tapply(data$ANGRY_COUNT, data$Page_Name == "韓國瑜",sum)#韓國瑜angry數量1993個
+```
+```{r}
+#計算高雄選韓國瑜News貼文粉絲按的表情(like,wow,love,haha,sad,angry)數量
+tapply(data$LIKE_COUNT, data$Page_Name == "高雄選韓國瑜News",sum)#韓國瑜like數量為508781個
+tapply(data$WOW_COUNT, data$Page_Name == "高雄選韓國瑜News",sum)#韓國瑜wow數量為1612個
+tapply(data$LOVE_COUNT, data$Page_Name == "高雄選韓國瑜News",sum)#韓國瑜love數量為12061個
+tapply(data$HAHA_COUNT, data$Page_Name == "高雄選韓國瑜News",sum)#韓國瑜haha數量9371個
+tapply(data$SAD_COUNT, data$Page_Name == "高雄選韓國瑜News",sum)#韓國瑜sad數量363個
+tapply(data$ANGRY_COUNT, data$Page_Name == "高雄選韓國瑜News",sum)#韓國瑜angry數量638個
+```
+
+```{r}
+#計算陳其邁貼文粉絲按的表情(like,wow,love,haha,sad,angry)數量
+tapply(data$LIKE_COUNT, data$Page_Name == "陳其邁 Chen Chi-Mai",sum)#陳其邁like數量為164,1447個
+tapply(data$WOW_COUNT, data$Page_Name == "陳其邁 Chen Chi-Mai",sum)#陳其邁wow數量為1885個
+tapply(data$LOVE_COUNT, data$Page_Name == "陳其邁 Chen Chi-Mai",sum)#陳其邁love數量為79021個
+tapply(data$HAHA_COUNT, data$Page_Name == "陳其邁 Chen Chi-Mai",sum)#陳其邁haha數量為15117個
+tapply(data$SAD_COUNT, data$Page_Name == "陳其邁 Chen Chi-Mai",sum)#陳其邁sad數量為20591個
+tapply(data$ANGRY_COUNT, data$Page_Name == "陳其邁 Chen Chi-Mai",sum)#陳其邁angry數量為21698個
+
+```
+
+```{r}
+#比較韓陳兩陣營個表情數，先將韓國瑜兩個粉專表情數相加
+tapply(data$LIKE_COUNT, data$Page_Name == "韓國瑜",sum)+tapply(data$LIKE_COUNT, data$Page_Name == "高雄選韓國瑜News",sum)#3237505
+tapply(data$WOW_COUNT, data$Page_Name == "韓國瑜",sum)+tapply(data$WOW_COUNT, data$Page_Name == "高雄選韓國瑜News",sum)#4296
+tapply(data$LOVE_COUNT, data$Page_Name == "韓國瑜",sum)+tapply(data$LOVE_COUNT, data$Page_Name == "高雄選韓國瑜News",sum)#170460 
+tapply(data$HAHA_COUNT, data$Page_Name == "韓國瑜",sum)+tapply(data$HAHA_COUNT, data$Page_Name == "高雄選韓國瑜News",sum)#29196
+tapply(data$SAD_COUNT, data$Page_Name == "韓國瑜",sum)+tapply(data$SAD_COUNT, data$Page_Name == "韓國瑜",sum)#5980
+tapply(data$ANGRY_COUNT, data$Page_Name == "韓國瑜",sum)+tapply(data$ANGRY_COUNT, data$Page_Name == "高雄選韓國瑜News",sum)#2631
+#設values
+like_Han = 3237505
+wow_Han= 4296
+love_Han = 170460
+haha_Han = 29196
+sad_Han= 5980
+angry_Han= 2631
+#將韓國瑜個表情數做成dataframe
+expression_count_Han= data.frame(like_Han,wow_Han,love_Han,haha_Han,sad_Han,angry_Han)
+```
+```{r}
+#陳其邁各表情數
+like_Chen = 1641447
+wow_Chen = 1885
+love_Chen =  79021 
+haha_Chen = 15117
+sad_Chen = 20591
+angry_Chen = 21698
+#做成dataframe
+expression_count_Chen = data.frame(like_Chen,wow_Chen,love_Chen,haha_Chen,sad_Chen,angry_Chen)
+```
+
+```{r}
+#比較，將韓國瑜陳其邁的表情資料合併
+like_count = data.frame(like_Han,like_Chen)
+wow_count = data.frame(wow_Han,wow_Chen)
+love_count = data.frame(love_Han,love_Chen)
+haha_count = data.frame(haha_Han,haha_Chen)
+sad_count = data.frame(sad_Han,sad_Chen)
+angry_count = data.frame(angry_Han,angry_Chen)
+
+like_Han>like_Chen#韓贏
+wow_Han>wow_Chen#韓贏
+love_Han>love_Chen#韓贏
+haha_Han>haha_Chen#韓贏
+sad_count>sad_Chen#陳贏
+angry_Han>angry_Chen#陳贏
+#在比較正面的表情如:讚、愛心、哇、哈哈等都是韓國瑜較多，而比較負面的情緒如:傷心、生氣都是陳其邁較多
+```
+
+
+
+
