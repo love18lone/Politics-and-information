@@ -1,5 +1,5 @@
 ---
-title: "高雄市長候選人6月到9月表情貼比較"
+title: "高雄市長候選人6月到11月表情貼比較"
 author: "Kyle"
 date: "2019年3月11日"
 output: html_document
@@ -13,16 +13,18 @@ data7 <- read_csv("201807_data.csv")
 data8 <- read_csv("201808_data.csv")
 data9 <- read_csv("201809_data.csv")
 data10 <- read_csv("201810_data.csv")
-data=rbind(data6, data7, data8,data9)
+data11 = read_csv("201811_data.csv")
+data12= read_csv("201812_data.csv")
+data=rbind(data6, data7, data8,data9,data10,data11,data12)
 ```
 
 
 ```{r}
-#將韓國瑜與陳其邁的貼文單獨分離，
+#將韓國瑜與陳其邁的貼文單獨分離
 library(dplyr)
-Han=filter(data, grepl("韓國瑜", data$Page_Name)== T& grepl("韓國瑜粉絲團", data$Page_Name)== F& grepl("韓國瑜新聞網", data$Page_Name)== F& grepl("高雄選韓國瑜News", data$Page_Name)== F& grepl("韓國瑜民間粉絲團志工團
-", data$Page_Name)== F)
-#上面的方法無法將"韓國瑜民間粉絲團志工團"這個欄位刪掉，但是其他的"韓國瑜粉絲團","高雄選韓國瑜News","韓國瑜新聞網"可以刪掉。
+Han = filter (data, grepl("韓國瑜", data$Page_Name)== T& grepl("韓國瑜粉絲團", data$Page_Name)== F& grepl("韓國瑜新聞網",data$Page_Name) == F&grepl("侯友宜 盧秀燕 韓國瑜 北中南連線",data$Page_Name)== F & grepl("高雄在地韓國瑜News",data$Page_Name)== F & grepl("高雄選韓國瑜News",data$Page_Name) == F & grepl("韓國瑜民間粉絲團（志工團", data$Page_Name) ==F)
+
+
 
 Chen = filter(data,grepl("陳其邁",data$Page_Name) == T)
 ```
