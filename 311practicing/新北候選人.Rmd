@@ -1,0 +1,145 @@
+---
+---
+title: "新北候選人分析"
+author: "Kyle"
+date: "2019年3月22日"
+output: html_document
+---
+---
+
+```{r}
+#讀取資料
+library(readr)
+data7 <- read_csv("201807_data.csv")
+data8 <- read_csv("201808_data.csv")
+data9 <- read_csv("201809_data.csv")
+data10 <- read_csv("201810_data.csv")
+data11 = read_csv("201811_data.csv")
+data=rbind(data7, data8,data9,data10,data11)
+rm(data7,data8,data9,data10,data11)
+```
+
+```{r}
+library(dplyr)
+Su = filter(data, grepl("蘇貞昌", data$Page_Name) == T&grepl("蘇貞昌後援會", data$Page_Name) == F) 
+Hou = filter(data, grepl("侯友宜", data$Page_Name) == T&grepl("鐵漢柔情 力挺侯友宜", data$Page_Name) == F) 
+
+
+```
+
+```{r}
+#設定時間
+Su$Date = as.POSIXct(Su$Date,format = "%Y/%m/%d %H:%M:%S")
+Hou$Date = as.POSIXct(Hou$Date,format = "%Y/%m/%d %H:%M:%S")
+```
+
+```{r}
+#把11/24之後的貼文刪除以及加一個只有日期沒有時間的欄位
+library(ggplot2)
+Pei = rbind(Hou,Su)
+
+Pei = filter(Pei,Pei$Date<"2018/11/24")
+Pei$cDate = as.character(Pei$Date)
+Pei$cDate = sapply(Pei$cDate,function(x) strsplit(x,"[ ]") %>% unlist %>% .[1])
+Pei$cDate = Pei$cDate %>% as.Date("%Y-%m-%d")
+```
+
+
+
+```{r}
+#兩候選人總Po文類型比較
+Peitype=Pei%>%group_by(Type)%>%count()
+label_value <- paste('(', round(Peitype$n/sum(Peitype$n) * 100, 1), '%)', sep = '')
+label=paste(Peitype$Type,label_value,sep = "")
+ggplot(Peitype, aes(x="", y=n, fill=Type)) +
+       geom_bar(width = 1, stat = "identity") +
+       coord_polar("y", start=0)+
+       labs(x = '', y = '', title = '')+
+       theme(axis.text = element_blank())+
+       scale_fill_discrete(labels = label)
+```
+```{r}
+#蘇貞昌貼文類型分析
+Sutype=Su%>%group_by(Type)%>%count()
+label_value <- paste('(', round(Sutype$n/sum(Sutype$n) * 100, 1), '%)', sep = '')
+label=paste(Sutype$Type,label_value,sep = "")
+ggplot(Sutype, aes(x="", y=n, fill=Type)) +
+       geom_bar(width = 1, stat = "identity") +
+       coord_polar("y", start=0)+
+       labs(x = '', y = '', title = '')+
+       theme(axis.text = element_blank())+
+       scale_fill_discrete(labels = label)
+```
+
+```{r}
+#侯友宜貼文類型分析
+Houtype=Su%>%group_by(Type)%>%count()
+label_value <- paste('(', round(Houtype$n/sum(Houtype$n) * 100, 1), '%)', sep = '')
+label=paste(Houtype$Type,label_value,sep = "")
+ggplot(Houtype, aes(x="", y=n, fill=Type)) +
+       geom_bar(width = 1, stat = "identity") +
+       coord_polar("y", start=0)+
+       labs(x = '', y = '', title = '')+
+       theme(axis.text = element_blank())+
+       scale_fill_discrete(labels = label)
+```
+```{r}
+#侯友宜6-11/24貼文數量變化
+Houcount=Hou%>%group_by(month=format(Date,"%m"))%>%count()
+ggplot(Houcount,aes(x=month,y=n))+
+  geom_bar(stat = "identity")
+```
+```{r}
+#蘇貞昌6-11/24貼文數量變化
+Sucount=Su%>%group_by(month=format(Date,"%m"))%>%count()
+ggplot(Sucount,aes(x=month,y=n))+
+  geom_bar(stat = "identity")
+```
+
+```{r}
+#蘇侯每月PO文字次數比較
+Sucount=Su%>%group_by(month=format(Date,"%m"))%>%count()%>%mutate(group="Su")
+Houcount=Hou%>%group_by(month=format(Date,"%m"))%>%count()%>%mutate(group="Hou")
+monthcount=rbind(Sucount,Houcount)%>%arrange((month))
+ggplot(monthcount,aes(x=month,y=n,fill=group))+
+  geom_bar(stat="identity",position = "dodge")
+```
+
+
+```{r}
+ggplot(Pei,aes(x=Type,y=LIKE_COUNT))+
+  geom_boxplot(col = "red")
+```
+
+```{r}
+library(ggpubr)
+ggqqplot(Su$All_Reaction_Count)
+```
+
+```{r}
+library(corrplot)
+cor(Su[c(6:14)])%>%corrplot.mixed(lower = "pie",tl.cex=0.6)
+```
+
+
+```{r}
+ggscatter(Su,x="All_Reaction_Count",y="LIKE_COUNT", add = "reg.line", conf.int = TRUE,cor.coef = TRUE, cor.method = "pearson")
+```
+
+```{r}
+#兩候選人like count分析
+#折線圖(6到11月24)，用月作為區分
+ggplot(Pei, aes(x = cDate,y = LIKE_COUNT,colour = Page_Name))+ geom_line()+
+  geom_vline(xintercept = as.Date("2018-07-24"),col = "black") + 
+  geom_vline(xintercept = as.Date("2018-08-24"),col = "black") +
+  geom_vline(xintercept = as.Date("2018-09-24"),col = "black") +
+  geom_vline(xintercept = as.Date("2018-10-24"),col = "black") +
+  geom_vline(xintercept = as.Date("2018-11-24"),col = "black")
+  
+```
+
+```{r}
+
+
+```
+
